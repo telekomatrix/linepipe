@@ -1,4 +1,4 @@
-require "linepipe/dsl"
+require_relative "dsl"
 
 module Linepipe
   class Process

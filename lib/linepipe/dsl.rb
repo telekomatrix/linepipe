@@ -1,5 +1,5 @@
-require "linepipe/expectation"
-require "linepipe/step"
+require_relative "expectation"
+require_relative "step"
 
 module Linepipe
   module DSL

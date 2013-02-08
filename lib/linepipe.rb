@@ -1,5 +1,5 @@
-require "linepipe/version"
-require "linepipe/process"
+require_relative "linepipe/version"
+require_relative "linepipe/process"
 
 module Linepipe
   class << self
