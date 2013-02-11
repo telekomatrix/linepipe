@@ -20,12 +20,12 @@ module Linepipe
 
     def run
       run_setup
-      @output = steps.reduce(@data.call) { |d, step| step.apply(d) }
+      @output = steps.reduce(initial_data) { |d, step| step.apply(d) }
     end
 
     def develop
       run_setup
-      @output = steps.to_enum.with_index.reduce(@data.call) { |d, (step, idx)|
+      @output = steps.to_enum.with_index.reduce(initial_data) { |d, (step, idx)|
         io.puts "Stage #{idx} #{step.name}"
         io.puts "Input: #{d}"
         step.apply(d).tap do |r|
@@ -50,7 +50,7 @@ module Linepipe
       $stdout = stringio = StringIO.new
 
       Benchmark.bmbm(label_length) do |x|
-        @output = steps.reduce(@data.call) { |d, step|
+        @output = steps.reduce(initial_data) { |d, step|
           result = step.apply(d)
           x.report(step.name) { iterations.times { step.apply(d) } }
           result
@@ -62,12 +62,22 @@ module Linepipe
       $stdout = out
     end
 
+
     private
     attr_reader :expectations, :io
 
     def run_setup
       @setup.call if @setup
     end
+
+    def initial_data
+      if @data.is_a?(Proc)
+        @data.call
+      else
+        puts "[Linepipe] Warn: You need to specify an initial data set"
+      end
+    end
+
   end
 end
 
