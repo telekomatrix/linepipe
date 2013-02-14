@@ -59,8 +59,8 @@ Once you're comfortable with your algorithm, just change your call to
 
 ## Testing your linepipes
 
-Both `Linepipe.run` and `Linepipe.develop` return a Linepipe object that
-responds to two important methods: `result` (the output), and a hash-like
+`Linepipe.run`, `Linepipe.benchmark` and `Linepipe.develop` return a `Linepipe::Process` object that
+responds to two important methods: `output` and a hash-like
 interface to access each step. In our case above we would access the second step
 "Reversing" (from a test or wherever) like this:
 
