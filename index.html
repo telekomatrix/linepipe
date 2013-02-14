@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Linepipe : A tool to aid in processing data in a pipeline, making every step easily testable and benchmarkable." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Linepipe</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/wimdu/linepipe">View on GitHub</a>
+
+          <h1 id="project_title">Linepipe</h1>
+          <h2 id="project_tagline">A tool to aid in processing data in a pipeline, making every step easily testable and benchmarkable.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/wimdu/linepipe/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/wimdu/linepipe/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>Linepipe</h1>
+
+<p>A tool to aid in processing data in a pipeline, making every step easily
+testable and benchmarkable.</p>
+
+<h2>Installation</h2>
+
+<p>Add this line to your application's Gemfile:</p>
+
+<pre><code>gem 'linepipe'
+</code></pre>
+
+<p>And then execute:</p>
+
+<pre><code>$ bundle
+</code></pre>
+
+<p>Or install it yourself as:</p>
+
+<pre><code>$ gem install linepipe
+</code></pre>
+
+<h2>Usage</h2>
+
+<p>Linepipe's DSL consists of 4 different parts:</p>
+
+<ul>
+<li>
+<code>setup</code>: Optional setup that will be run at the beginning.</li>
+<li>
+<code>data</code>: The input data.</li>
+<li>
+<code>process</code>: As many of these as you want will conform the steps of your
+algorithm.</li>
+<li>
+<code>expect</code>: In development mode, each of these will be run against your final
+output data to ensure its conformity with your expectations.</li>
+</ul><p>While developing a processing algorithm, <code>Linepipe.develop</code> is your friend. Each
+<code>process</code> block will be reduced against your data in order, and then each
+<code>expect</code> block will be run against the final output to ensure that it works.</p>
+
+<div class="highlight"><pre><span class="n">linepipe</span> <span class="o">=</span> <span class="no">Linepipe</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span>
+  <span class="n">data</span> <span class="p">{</span>
+    <span class="sx">%w(foo bar baz)</span>
+  <span class="p">}</span>
+
+  <span class="n">process</span><span class="p">(</span><span class="s2">"Upcasing"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">data</span><span class="o">|</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:upcase</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="n">process</span><span class="p">(</span><span class="s2">"Reversing"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">data</span><span class="o">|</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">reverse</span>
+  <span class="p">}</span>
+
+  <span class="n">expect</span> <span class="p">{</span> <span class="o">|</span><span class="n">data</span><span class="o">|</span>
+    <span class="n">data</span> <span class="o">==</span> <span class="sx">%w(BAZ BAR FOO)</span>
+  <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="n">linepipe</span><span class="o">.</span><span class="n">result</span> <span class="c1"># =&gt; %W(BAZ BAR FOO)</span>
+</pre></div>
+
+<p>Once you're comfortable with your algorithm, just change your call to
+<code>Linepipe.develop</code> to <code>Linepipe.run</code> and no expectations will be run.</p>
+
+<h2>Testing your linepipes</h2>
+
+<p><code>Linepipe.run</code>, <code>Linepipe.benchmark</code> and <code>Linepipe.develop</code> return a <code>Linepipe::Process</code> object that
+responds to two important methods: <code>output</code> and a hash-like
+interface to access each step. In our case above we would access the second step
+"Reversing" (from a test or wherever) like this:</p>
+
+<div class="highlight"><pre><span class="n">step</span> <span class="o">=</span> <span class="n">linepipe</span><span class="o">[</span><span class="s2">"Reversing"</span><span class="o">]</span>
+<span class="c1"># =&gt; #&lt;Step ...&gt;</span>
+<span class="n">expect</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="o">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">]</span><span class="p">))</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span><span class="p">(</span><span class="o">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span>
+<span class="c1"># =&gt; [3,2,1]</span>
+</pre></div>
+
+<p>This way you can test every stage of your linepipe separately against as many
+inputs as you want.</p>
+
+<h2>Benchmarking your linepipes</h2>
+
+<p>To switch Linepipe into benchmark mode, just call <code>Linepipe.benchmark</code> instead
+of <code>.develop</code> or <code>.run</code>. This will print a detailed benchmark for every step of
+your algorithm so you can easily identify and fix bottlenecks.</p>
+
+<div class="highlight"><pre><span class="n">linepipe</span> <span class="o">=</span> <span class="no">Linepipe</span><span class="o">.</span><span class="n">benchmark</span><span class="p">(</span><span class="mi">10_000</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">data</span> <span class="p">{</span>
+    <span class="sx">%w(foo bar baz)</span>
+  <span class="p">}</span>
+
+  <span class="n">process</span><span class="p">(</span><span class="s2">"Upcasing"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">data</span><span class="o">|</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:upcase</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="n">process</span><span class="p">(</span><span class="s2">"Reversing"</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">data</span><span class="o">|</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">reverse</span>
+  <span class="p">}</span>
+
+  <span class="n">expect</span> <span class="p">{</span> <span class="o">|</span><span class="n">data</span><span class="o">|</span>
+    <span class="n">data</span> <span class="o">==</span> <span class="sx">%w(BAZ BAR FOO)</span>
+  <span class="p">}</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>Will output to the screen:</p>
+
+<pre><code>Rehearsal ---------------------------------------------
+Upcasing    0.020000   0.000000   0.020000 (  0.024458)
+Reversing   0.000000   0.000000   0.000000 (  0.004000)
+------------------------------------ total: 0.020000sec
+
+                user     system      total        real
+Upcasing    0.020000   0.000000   0.020000 (  0.022565)
+Reversing   0.010000   0.000000   0.010000 (  0.007034)
+</code></pre>
+
+<h2>Contributing</h2>
+
+<ol>
+<li>Fork it</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request</li>
+</ol><h2>License</h2>
+
+<p>Copyright (c) 2013 Wimdu GmbH (MIT License). See LICENSE.txt for details.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Linepipe maintained by <a href="https://github.com/wimdu">wimdu</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
