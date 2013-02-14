@@ -7,9 +7,9 @@ Gem::Specification.new do |gem|
   gem.name          = "linepipe"
   gem.version       = Linepipe::VERSION
   gem.authors       = ["Josep M. Bach"]
-  gem.email         = ["josep.m.bach@gmail.com"]
-  gem.description   = %q{Process data in a maintainable and easily testable way.}
-  gem.summary       = %q{Process data in a maintainable and easily testable way.}
+  gem.email         = ["josep.bach@wimdu.com"]
+  gem.description   = %q{Process data one step at a time.}
+  gem.summary       = %q{Process data one step at a time.}
   gem.homepage      = "https://github.com/wimdu/linepipe"
 
   gem.files         = `git ls-files`.split($/)
