@@ -26,15 +26,15 @@ module Linepipe
     def develop
       run_setup
       @output = steps.to_enum.with_index.reduce(initial_data) { |d, (step, idx)|
-        io.puts "Stage #{idx} #{step.name}"
-        io.puts "Input: #{d}"
+        log "Stage #{idx}", step.name
+        log "Input", d
         step.apply(d).tap do |r|
-          io.puts "Output: #{r}"
+          log "Output", r
         end
       }
 
       if expectations.all? { |exp| exp.successful?(output) }
-        io.puts "SUCCESS!"
+        log "Expect", "SUCCESS"
       end
     end
 
@@ -66,15 +66,19 @@ module Linepipe
     private
     attr_reader :expectations, :io
 
+    def log(topic, msg = "")
+      io.puts "\n[Linepipe] #{topic} #{msg}\n"
+    end
+
     def run_setup
       @setup.call if @setup
     end
 
     def initial_data
-      if @data.is_a?(Proc)
-        @data.call
-      else
-        puts "[Linepipe] Warn: You need to specify an initial data set"
+      @data.call.tap do |data|
+        if data.nil?
+          log("Warn", "You need to specify an initial data set")
+        end
       end
     end
 

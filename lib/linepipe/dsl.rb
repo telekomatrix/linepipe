@@ -16,7 +16,7 @@ module Linepipe
     end
 
     def expect(msg=nil, &block)
-      @expectations << Expectation.new(msg, io, &block)
+      @expectations << Expectation.new(msg, method(:log), &block)
     end
   end
 end

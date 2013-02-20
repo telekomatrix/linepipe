@@ -5,16 +5,23 @@ require 'stringio'
 module Linepipe
   describe Expectation, '#successful?' do
     let(:io) { StringIO.new }
+    let(:log) { double('Log') }
+
+    before do
+      log.stub(:call)
+    end
 
     describe 'when it fails' do
       let(:expectation) do
-        Expectation.new('Failure message', io) { false }
+        Expectation.new('Failure message', log) { false }
       end
 
       it 'prints the message to the output' do
+        log.should_receive(:call) do |topic, msg|
+          expect(topic).to match(/expectation/i)
+          expect(msg).to match(/Failure message/)
+        end
         expectation.successful?(%w(some data))
-        expect(io.string).to match(/expectation_spec/)
-        expect(io.string).to match(/Failure message/)
       end
 
       it 'returns false' do
