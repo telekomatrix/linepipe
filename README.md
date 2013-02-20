@@ -3,6 +3,8 @@
 A tool to aid in processing data in a pipeline, making every step easily
 testable and benchmarkable.
 
+[![Build Status](https://travis-ci.org/wimdu/linepipe.png?branch=master)](https://travis-ci.org/wimdu/linepipe)
+
 ## Installation
 
 Add this line to your application's Gemfile:
