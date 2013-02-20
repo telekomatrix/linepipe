@@ -23,7 +23,7 @@ Linepipe's DSL consists of 4 different parts:
 
 * `setup`: Optional setup that will be run at the beginning.
 * `data`: The input data.
-* `process`: As many of these as you want will conform the steps of your
+* `step`: As many of these as you want will conform the steps of your
   algorithm.
 * `expect`: In development mode, each of these will be run against your final
   output data to ensure its conformity with your expectations.
@@ -33,16 +33,16 @@ While developing a processing algorithm, `Linepipe.develop` is your friend. Each
 `expect` block will be run against the final output to ensure that it works.
 
 ```ruby
-linepipe = Linepipe.run do
+linepipe = Linepipe.develop do
   data {
     %w(foo bar baz)
   }
 
-  process("Upcasing") { |data|
+  step("Upcasing") { |data|
     data.map(&:upcase)
   }
 
-  process("Reversing") { |data|
+  step("Reversing") { |data|
     data.reverse
   }
 
@@ -51,7 +51,7 @@ linepipe = Linepipe.run do
   }
 end
 
-linepipe.result # => %W(BAZ BAR FOO)
+linepipe.output # => %W(BAZ BAR FOO)
 ```
 
 Once you're comfortable with your algorithm, just change your call to
