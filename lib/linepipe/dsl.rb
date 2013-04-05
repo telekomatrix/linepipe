@@ -12,7 +12,8 @@ module Linepipe
     end
 
     def step(name=nil, &block)
-      @steps << Step.new(name, &block)
+      @steps << step = Step.new(name, &block)
+      step
     end
 
     def expect(msg=nil, &block)

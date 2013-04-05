@@ -10,8 +10,8 @@ module Linepipe
       Process.new(io).tap do |process|
         process.setup { process.taint }
         process.data { %w(foo bar baz) }
-        process.step('Upcasing') { |data| data.map(&:upcase) }
-        process.step('Reversing', &:reverse)
+        process.step('Upcasing') { |data| data.map(&:upcase) }.expect('is upcased') { |data| data.first == data.first.upcase }
+        process.step('Reversing', &:reverse).expect('is not reversed') { |data| data.first == 'foo' } # will fail
         process.expect { |data| data.first == 'BAZ' }
       end
     end
@@ -52,6 +52,12 @@ module Linepipe
         process.develop
         expect(io.string).to match(/Stage 0 Upcasing/)
         expect(io.string).to match(/Stage 1 Reversing/)
+      end
+
+      it 'outputs step expectation info to the io stream' do
+        process.develop
+        expect(io.string).to match(/is upcased: pass/)
+        expect(io.string).to match(/is not reversed: fail/)
       end
 
       describe 'when the expectations pass' do

@@ -10,6 +10,8 @@ class DevelopTest < MiniTest::Unit::TestCase
 
       step("Upcasing") { |data|
         data.map(&:upcase)
+      }.expect('is upcased') { |data|
+        data.first.upcase == data.first
       }
 
       step("Reversing") { |data|

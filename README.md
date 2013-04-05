@@ -26,7 +26,8 @@ Linepipe's DSL consists of 4 different parts:
 * `setup`: Optional setup that will be run at the beginning.
 * `data`: The input data.
 * `step`: As many of these as you want will conform the steps of your
-  algorithm.
+  algorithm. You can optionally provide an `expect` block that will test the
+  output right after than particular step.
 * `expect`: In development mode, each of these will be run against your final
   output data to ensure its conformity with your expectations.
 
@@ -42,12 +43,16 @@ linepipe = Linepipe.develop do
 
   step("Upcasing") { |data|
     data.map(&:upcase)
-  }
+  }.expect('is upcased') { |data|
+    data.first == 'FOO'
+  } # as you see, each step can have its own expectations that will be tested
+    # when the data leaves that particular step of the pipeline
 
   step("Reversing") { |data|
     data.reverse
   }
 
+  # now the final expectation on the result
   expect { |data|
     data == %w(BAZ BAR FOO)
   }
@@ -88,11 +93,11 @@ linepipe = Linepipe.benchmark(10_000) do
     %w(foo bar baz)
   }
 
-  process("Upcasing") { |data|
+  step("Upcasing") { |data|
     data.map(&:upcase)
   }
 
-  process("Reversing") { |data|
+  step("Reversing") { |data|
     data.reverse
   }
 

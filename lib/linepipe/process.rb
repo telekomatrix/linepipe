@@ -27,9 +27,12 @@ module Linepipe
       run_setup
       @output = steps.to_enum.with_index.reduce(initial_data) { |d, (step, idx)|
         log "Stage #{idx}", step.name
-        log "Input", d
-        step.apply(d).tap do |r|
-          log "Output", r
+        log "\tInput", d
+        step.apply(d).tap do |result|
+          log "\tOutput", result
+          step.verify_expectations(result).each do |expectation|
+            log "\t\t#{expectation.name}: #{expectation.status}"
+          end
         end
       }
 
